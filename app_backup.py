@@ -1,0 +1,148 @@
+from flask import Flask, render_template, session, redirect, request, url_for, flash, jsonify
+from flask_login import LoginManager
+from flask_bcrypt import Bcrypt
+from flask_wtf.csrf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_talisman import Talisman
+# ⬇️⬇️⬇️ ये नई lines add करो ⬇️⬇️⬇️
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # .env file load करो
+# ⬆️⬆️⬆️ यहाँ तक ⬆️⬆️⬆️
+
+# Sirf yahan se import karo
+from modules.models import db
+
+# ⚠️ Global variables - SIRF EK BAAR DEFINE KARO
+bcrypt = Bcrypt()
+limiter = None  # Global variable
+
+def create_app():
+    global limiter
+    app = Flask(__name__)
+    app.config['SECRET_KEY'] = 'zone-key'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///zone.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+    # CSRF Protection
+    csrf = CSRFProtect(app)
+    
+    # Rate Limiting
+    limiter = Limiter(
+        app=app,
+        key_func=get_remote_address,
+        default_limits=["200 per day", "50 per hour"]
+    )
+    
+    # Security Headers
+    talisman = Talisman(
+        app,
+        force_https=True,
+        content_security_policy=None
+    )
+    
+    # Session Security
+    app.config.update(
+        SESSION_COOKIE_SECURE=True,
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SAMESITE='Lax',
+        PERMANENT_SESSION_LIFETIME=3600
+    )
+    
+    # Initialize extensions
+    db.init_app(app)
+    bcrypt.init_app(app)
+    
+    # ⚠️ LOGIN MANAGER - YAHAN INITIALIZE KARO
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+    login_manager.login_view = 'auth.login'
+    # ⚠️ USER LOADER - YEH FUNCTION FLASK-LOGIN KE LIYE ZAROORI HAI
+    @login_manager.user_loader
+    def load_user(user_id):
+        from modules.models import User
+        return User.query.get(int(user_id))
+    
+    # Create tables
+    with app.app_context():
+        db.create_all()
+    
+    # Import blueprints (yahan import karo)
+    from modules.auth import auth_bp
+    from modules.payment import payment_bp
+    from modules.travel import travel_bp
+    from modules.fastag import fastag_bp
+    from modules.rewards import rewards_bp 
+    from modules.bills import bills_bp
+    from modules.entertainment import entertainment_bp
+    from modules.shopping import shopping_bp
+    from modules.insurance import insurance_bp
+    from modules.cibil import cibil_bp
+    from modules.ott import ott_bp
+    from modules.language import language_bp
+    from modules.market import market_bp
+    from modules.gov import gov_bp 
+    from modules.ai_assistant import ai_bp 
+    from modules.heritage import heritage_bp
+    from modules.bharat import bharat_bp 
+
+    # Register blueprints
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(payment_bp)
+    app.register_blueprint(fastag_bp)
+    app.register_blueprint(rewards_bp)
+    app.register_blueprint(travel_bp)
+    app.register_blueprint(bills_bp)
+    app.register_blueprint(entertainment_bp)
+    app.register_blueprint(shopping_bp)
+    app.register_blueprint(insurance_bp)
+    app.register_blueprint(cibil_bp)
+    app.register_blueprint(ott_bp)
+    app.register_blueprint(language_bp)
+    app.register_blueprint(market_bp)
+    app.register_blueprint(gov_bp)
+    app.register_blueprint(ai_bp)
+    app.register_blueprint(heritage_bp)
+    app.register_blueprint(bharat_bp)    
+
+    # Routes
+    @app.route('/')
+    def index():
+        return render_template('index.html', title='Zone Home')
+    
+    @app.route('/set-theme/<theme>')
+    def set_theme(theme):
+        if theme in ['orange', 'light', 'dark']:
+            session['theme'] = theme
+        return redirect(request.referrer or url_for('index'))
+    
+    @app.route('/about')
+    def about():
+        return render_template('about.html', title='About Zone')
+    
+    @app.route('/services')
+    def services():
+        return render_template('services.html', title='Our Services')
+   
+    @app.route('/api/select-plan', methods=['POST'])
+    def select_plan():
+        data = request.get_json()
+        print(f"Plan selected: {data}")
+        return jsonify({'success': True})
+    
+    @app.route('/contact', methods=['GET', 'POST'])
+    def contact():
+        if request.method == 'POST':
+            name = request.form.get('name')
+            flash(f'Thank you {name}! Your message has been sent!', 'success')
+            return redirect(url_for('contact'))
+        return render_template('contact.html', title='Contact Zone')
+    
+    return app
+
+app = create_app()
+
+if __name__ == '__main__':
+    app.run(debug=False, host='0.0.0.0', port=5000)

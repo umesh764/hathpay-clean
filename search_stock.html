@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Search - Market Live</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .nav-links a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: #333;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .nav-links a:hover {
+            background: #667eea;
+            color: white;
+        }
+        .search-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .search-box button {
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .popular-stocks {
+            margin-top: 20px;
+        }
+        .popular-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .stock-btn {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .stock-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        .result-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .stock-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .info-item {
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .positive {
+            color: #28a745;
+        }
+        .negative {
+            color: #dc3545;
+        }
+        .buy-form {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+        .buy-form input {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            width: 150px;
+            margin-right: 10px;
+        }
+        .buy-btn {
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .balance {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">📈 Market Live</div>
+            <div class="nav-links">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/search-stock" class="active">🔍 Search Share</a>
+                <a href="/portfolio">My Portfolio</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+
+        <div class="search-card">
+            <h2>🔍 Share Search</h2>
+            <p style="margin-bottom: 15px; color: #666;">Koi bhi share search karo jaise: RELIANCE, TCS, HDFCBANK, INFY</p>
+            
+            <div class="search-box">
+                <input type="text" id="stockSymbol" placeholder="Share name likho (e.g., RELIANCE, TCS)" autocomplete="off">
+                <button onclick="searchStock()">🔍 Search</button>
+            </div>
+
+            <div class="popular-stocks">
+                <strong>Popular Shares:</strong>
+                <div class="popular-buttons">
+                    <button class="stock-btn" onclick="searchQuick('RELIANCE')">RELIANCE</button>
+                    <button class="stock-btn" onclick="searchQuick('TCS')">TCS</button>
+                    <button class="stock-btn" onclick="searchQuick('HDFCBANK')">HDFC BANK</button>
+                    <button class="stock-btn" onclick="searchQuick('INFY')">INFOSYS</button>
+                    <button class="stock-btn" onclick="searchQuick('ICICIBANK')">ICICI BANK</button>
+                    <button class="stock-btn" onclick="searchQuick('TATAMOTORS')">TATA MOTORS</button>
+                    <button class="stock-btn" onclick="searchQuick('WIPRO')">WIPRO</button>
+                </div>
+            </div>
+
+            <div id="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        async function searchStock() {
+            const symbol = document.getElementById('stockSymbol').value.toUpperCase().trim();
+            if (!symbol) {
+                alert('Koi share name likho!');
+                return;
+            }
+            await fetchStockData(symbol);
+        }
+
+        async function searchQuick(symbol) {
+            document.getElementById('stockSymbol').value = symbol;
+            await fetchStockData(symbol);
+        }
+
+        async function fetchStockData(symbol) {
+            try {
+                const response = await fetch(`/api/stock/${symbol}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    document.getElementById('result').innerHTML = `
+                        <div class="result-card">
+                            <div class="message error">❌ ${data.error}</div>
+                        </div>
+                    `;
+                    document.getElementById('result').style.display = 'block';
+                    return;
+                }
+                
+                const changeClass = data.change >= 0 ? 'positive' : 'negative';
+                const changeSymbol = data.change >= 0 ? '+' : '';
+                
+                document.getElementById('result').innerHTML = `
+                    <div class="result-card">
+                        <h3>📊 ${data.name} (${data.symbol})</h3>
+                        <div class="stock-info">
+                            <div class="info-item">
+                                <div class="info-label">Current Price</div>
+                                <div class="info-value">₹${data.current_price.toFixed(2)}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Change</div>
+                                <div class="info-value ${changeClass}">${changeSymbol}₹${data.change.toFixed(2)} (${changeSymbol}${data.change_percent.toFixed(2)}%)</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Day High</div>
+                                <div class="info-value">₹${data.day_high.toFixed(2)}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Day Low</div>
+                                <div class="info-value">₹${data.day_low.toFixed(2)}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Previous Close</div>
+                                <div class="info-value">₹${data.previous_close.toFixed(2)}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="buy-form">
+                            <h4>🛒 Share Purchase</h4>
+                            <input type="number" id="quantity_${data.symbol}" placeholder="Quantity" min="1">
+                            <button class="buy-btn" onclick="buyStock('${data.symbol}', ${data.current_price})">Buy Now</button>
+                            <div id="buyMessage_${data.symbol}"></div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('result').style.display = 'block';
+                
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <div class="result-card">
+                        <div class="message error">❌ Error: Share nahi mila. Sahi name likho!</div>
+                    </div>
+                `;
+                document.getElementById('result').style.display = 'block';
+            }
+        }
+
+        async function buyStock(symbol, price) {
+            const quantity = document.getElementById(`quantity_${symbol}`).value;
+            
+            if (!quantity || quantity < 1) {
+                alert('Quantity sahi se bharo!');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/buy-stock', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        symbol: symbol,
+                        quantity: parseInt(quantity),
+                        price: price
+                    })
+                });
+                
+                const result = await response.json();
+                const msgDiv = document.getElementById(`buyMessage_${symbol}`);
+                
+                if (result.success) {
+                    msgDiv.innerHTML = `<div class="message success">✅ ${result.message} New Balance: ₹${result.new_balance.toFixed(2)}</div>`;
+                    // Update balance display
+                    if (result.new_balance) {
+                        // You can update the balance in header if needed
+                    }
+                } else {
+                    msgDiv.innerHTML = `<div class="message error">❌ ${result.error}</div>`;
+                }
+                
+                setTimeout(() => {
+                    msgDiv.innerHTML = '';
+                }, 5000);
+                
+            } catch (error) {
+                alert('Error in buying stock!');
+            }
+        }
+    </script>
+</body>
+</html>
