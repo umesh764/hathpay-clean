@@ -19,7 +19,6 @@ async-lru==2.0.5
 attrs==24.3.0
 audioop-lts==0.2.1
 audioread==3.0.1
-av==14.4.0
 babel==2.18.0
 bcrypt==5.0.0
 beartype==0.21.0
