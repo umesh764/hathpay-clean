@@ -265,7 +265,6 @@ pydantic_core==2.41.5
 pydeck==0.9.1
 pydot==3.0.4
 pydub==0.25.1
-pygame==2.6.1
 PyGetWindow==0.0.9
 Pygments==2.19.2
 PyInquirer==1.0.3
